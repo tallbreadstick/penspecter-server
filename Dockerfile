@@ -19,11 +19,11 @@ COPY . .
 # Build the app
 RUN cargo build --release
 
-# Use a smaller image to run the app
-FROM debian:bullseye-slim
+# Use a lighter base image to run the app (alpine)
+FROM alpine:latest
 
-# Install dependencies including libc6 (to make sure GLIBC is compatible)
-RUN apt-get update && apt-get install -y libc6
+# Install dependencies including libc6 and gcc for compatibility
+RUN apk add --no-cache libc6-compat
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /usr/src/penspecter-server/target/release/penspecter-server /usr/local/bin/penspecter-server
