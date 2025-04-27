@@ -22,8 +22,8 @@ RUN cargo build --release
 # Use a lighter base image to run the app (alpine)
 FROM alpine:latest
 
-# Install dependencies including libc6 and gcc for compatibility
-RUN apk add --no-cache libc6-compat
+# Install necessary dependencies (libgcc, libstdc++, libc6-compat)
+RUN apk add --no-cache libc6-compat libgcc libstdc++
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /usr/src/penspecter-server/target/release/penspecter-server /usr/local/bin/penspecter-server
