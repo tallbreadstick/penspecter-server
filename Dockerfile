@@ -1,29 +1,23 @@
 # Use official Rust image as the base image
-FROM rust:latest as builder
+FROM rust:1.67-slim as builder
 
 # Set the working directory inside the container
 WORKDIR /usr/src/penspecter-server
 
-# Copy the Cargo.toml and Cargo.lock files and build dependencies
+# Copy Cargo.toml and Cargo.lock first to leverage caching
 COPY Cargo.toml Cargo.lock ./
 
-# Create a dummy main.rs so Cargo can fetch dependencies
-RUN mkdir src && echo "fn main() {}" > src/main.rs
-
 # Fetch dependencies
-RUN cargo build --release
+RUN cargo fetch
 
-# Now copy the source code and build the final binary
+# Now copy the rest of the source code and build the final binary
 COPY . .
 
 # Build the app
 RUN cargo build --release
 
-# Use a lighter base image to run the app (alpine)
-FROM alpine:latest
-
-# Install necessary dependencies (libgcc, libstdc++, libc6-compat)
-RUN apk add --no-cache libc6-compat libgcc libstdc++
+# Use a smaller runtime base image
+FROM debian:bullseye-slim
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /usr/src/penspecter-server/target/release/penspecter-server /usr/local/bin/penspecter-server
