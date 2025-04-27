@@ -1,5 +1,5 @@
 # Use official Rust image as the base image
-FROM rust:1.75-slim as builder
+FROM rust:1.81-slim as builder
 
 # Set the working directory inside the container
 WORKDIR /usr/src/penspecter-server
